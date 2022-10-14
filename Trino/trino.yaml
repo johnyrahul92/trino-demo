@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trino
+spec:
+  selector:
+    matchLabels:
+      app: trino
+  template:
+    metadata:
+      labels:
+        app: trino
+    spec:
+      containers:
+      - name: trino-k8
+        image: trino-k8
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+          - name: testtrinoenv
+            valueFrom:
+                secretKeyRef:
+                  key: mongoroot-username
+                  name: mongodb-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino-service
+spec:
+  selector:
+    app: trino
+  type: LoadBalancer  
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30001
+  
